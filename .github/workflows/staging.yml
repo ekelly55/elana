@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v4
       
     - name: Create empty file
-      run: touch empty.txt
+      run: touch staging.txt
       
     - name: Configure Git
       run: |
@@ -24,6 +24,6 @@ jobs:
         
     - name: Commit file
       run: |
-        git add empty.txt
+        git add staging.txt
         git commit -m "Add empty file"
         git push
