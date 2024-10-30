@@ -25,7 +25,16 @@ jobs:
         run: |
           cd elana-site
           touch test.txt
-          git add .
-          git commit -m"committing test run"
+
+
+      - name: Configure Git
+        run: |
+          git config --global user.ekelly55 'github-actions[bot]'
+          git config --global user.eamonn.michael.kelly@gmail.com 'github-actions[bot]@users.noreply.github.com'
         
+      - name: Commit file
+        run: |
+          git add test.txt
+          git commit -m "Add empty file"
+          git push
 
