@@ -1,0 +1,27 @@
+name: Build, Zip, and Deploy Lambda
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - elana-site/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  packages: read
+
+jobs:
+  build-zip-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: test-run
+        run: |
+          cd elana-site
+          touch test.txt
+        
+
