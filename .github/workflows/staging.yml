@@ -18,24 +18,25 @@ jobs:
     - uses: actions/checkout@v4
       with:
         ref: staging
-        fetch-depth: 2  # Get the last 2 commits for comparison
+        fetch-depth: 0  # Fetch all history for proper comparison
     
     - uses: dorny/paths-filter@v3
       id: filter
       with:
-        base: HEAD^1  # Compare with previous commit
-        ref: HEAD     # Current commit
+        base: ${{ github.event.before }}  # Use the previous commit SHA
+        ref: ${{ github.sha }}            # Use current commit SHA
         filters: |
           src:
             - 'elana-site/src/**'
           public:
             - 'elana-site/public/**'
 
+    # Rest of your workflow remains the same
     - name: Debug
       run: |
         echo "src changes: ${{ steps.filter.outputs.src }}"
         echo "public changes: ${{ steps.filter.outputs.public }}"
-        git log -2 --oneline  # Show last 2 commits
+        git log -2 --oneline
 
     - name: update src
       if: steps.filter.outputs.src == 'true'
