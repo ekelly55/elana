@@ -1,40 +1,29 @@
-name: Build, Zip, and Deploy Lambda
+name: Create Empty File
 
 on:
   push:
-    branches:
-      - main
-      - staging
-    paths:
-      - ./elana-site/**
+    branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  issues: write
-  packages: read
-
 jobs:
-  build-zip-deploy:
+  create-file:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: test-run
-        run: |
-          cd elana-site
-          touch test.txt
-
-
-      - name: Configure Git
-        run: |
-          git config --global user.ekelly55 'github-actions[bot]'
-          git config --global user.eamonn.michael.kelly@gmail.com 'github-actions[bot]@users.noreply.github.com'
+    - uses: actions/checkout@v4
+      
+    - name: Create empty file
+      run: touch empty.txt
+      
+    - name: Configure Git
+      run: |
+        git config --global user.ekelly55 'github-actions[bot]'
+        git config --global user.eamonn.michael.kelly@gmail.com 'github-actions[bot]@users.noreply.github.com'
         
-      - name: Commit file
-        run: |
-          git add elana-site/test.txt
-          git commit -m "Add empty file"
-          git push
-
+    - name: Commit file
+      run: |
+        git add empty.txt
+        git commit -m "Add empty file"
+        git push
