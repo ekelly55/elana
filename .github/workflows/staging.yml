@@ -27,6 +27,6 @@ jobs:
 
     - name: Commit file
       run: |
-        git add staging2.txt
+        git add staging.txt
         git commit -m "Add empty file"
         git push
