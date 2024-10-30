@@ -16,29 +16,22 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          src:
+          - 'elana-site/src/**'
+          public:
+          - 'elana-site/public/**'
 
-    - name: Debug commit information
-      run: |
-        echo "Comparing commits:"
-        echo "Before: ${{ github.event.before }}"
-        echo "After: ${{ github.event.after }}"
-        echo "Modified files: ${{ toJSON(github.event.head_commit.modified) }}"
-        echo "Added files: ${{ toJSON(github.event.head_commit.added) }}"
-        echo "Removed files: ${{ toJSON(github.event.head_commit.removed) }}"
-        
-    - name: Add log to elana-site/src
-      if: |
-        contains(toJSON(github.event.head_commit.modified), 'elana-site/src') || 
-        contains(toJSON(github.event.head_commit.added), 'elana-site/src') ||
-        contains(toJSON(github.event.head_commit.removed), 'elana-site/src')
+    - name: update src
+      if: steps.changes.outputs.src == 'true'
       run: |
         echo "New content added to /src $(date)" >> ./elana-site/src/log.txt
-
-    - name: Add log to elana-site/public
-      if: |
-        contains(toJSON(github.event.head_commit.modified), 'elana-site/public') || 
-        contains(toJSON(github.event.head_commit.added), 'elana-site/public') ||
-        contains(toJSON(github.event.head_commit.removed), 'elana-site/public')
+   
+    - name: update public
+      if: steps.changes.outputs.public == 'true'
       run: |
         echo "New content added to /public $(date)" >> ./elana-site/public/log.txt
       
