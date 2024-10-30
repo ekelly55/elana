@@ -25,5 +25,7 @@ jobs:
         run: |
           cd elana-site
           touch test.txt
+          git add .
+          git commit -m"committing test run"
         
 
