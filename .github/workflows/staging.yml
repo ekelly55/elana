@@ -1,8 +1,8 @@
-name: Create Empty File
+name: Log changes to staging
 
 on:
   push:
-    branches: [ main, staging ]
+    branches: [ staging ]
     paths:
       - elana-site/src/**
       - elana-site/public/**
@@ -17,9 +17,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       
-    - name: Add content to file
+    - name: Add log to elana-site/src
+      if: contains(toJSON(github.event.head_commit.modified), 'elana-site/src/') || contains(toJSON(github.event.head_commit.added), 'elana-site/src/')
       run: |
-        echo "New content added $(date)" >> staging.txt
+        echo "New content added to /src $(date)" >> ./elana-site/src/log.txt
+
+    - name: Add log to elana-site/public
+      if: contains(toJSON(github.event.head_commit.modified), 'elana-site/public/') || contains(toJSON(github.event.head_commit.added), 'elana-site/public/')
+      run: |
+        echo "New content added to /public $(date)" >> ./elana-site/public/log.txt
       
     - name: Configure Git
       run: |
@@ -28,6 +34,6 @@ jobs:
 
     - name: Commit file
       run: |
-        git add staging.txt
-        git commit -m "Add timestamp to staging.txt"
+        git add ./elana-site
+        git commit -m "Add log"
         git push
