@@ -3,6 +3,8 @@ name: Create Empty File
 on:
   push:
     branches: [ main, staging ]
+    paths:
+      - elana-site/src/**
   workflow_dispatch:
 
 jobs:
@@ -14,8 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       
-    - name: Create empty file
-      run: touch staging2.txt
+    - name: Add content to file
+      run: |
+        echo "New content added $(date)" >> staging.txt
       
     - name: Configure Git
       run: |
