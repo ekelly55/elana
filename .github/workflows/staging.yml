@@ -19,9 +19,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: test-run
         run: |
-          cd ./elana-site
+          cd elana-site
           touch test.txt
         
 
