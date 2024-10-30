@@ -17,11 +17,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Debug file changes
+    - name: Debug commit information
       run: |
+        echo "Comparing commits:"
+        echo "Before: ${{ github.event.before }}"
+        echo "After: ${{ github.event.after }}"
         echo "Modified files: ${{ toJSON(github.event.head_commit.modified) }}"
         echo "Added files: ${{ toJSON(github.event.head_commit.added) }}"
-      
+        echo "Removed files: ${{ toJSON(github.event.head_commit.removed) }}"
+        
     - name: Add log to elana-site/src
       if: |
         contains(toJSON(github.event.head_commit.modified), 'elana-site/src') || 
