@@ -19,8 +19,8 @@ jobs:
       
     - name: Configure Git
       run: |
-        git config --global user.ekelly55 'github-actions[bot]'
-        git config --global user.eamonn.michael.kelly@gmail.com 'github-actions[bot]@users.noreply.github.com'
+        git config --global ekelly55 'github-actions[bot]'
+        git config --global eamonn.michael.kelly@gmail.com 'github-actions[bot]@users.noreply.github.com'
         
     - name: Commit file
       run: |
