@@ -16,32 +16,50 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: staging
+        fetch-depth: 2  # Get the last 2 commits for comparison
+    
     - uses: dorny/paths-filter@v3
       id: filter
       with:
+        base: HEAD^1  # Compare with previous commit
+        ref: HEAD     # Current commit
         filters: |
           src:
-          - 'elana-site/src/**'
+            - 'elana-site/src/**'
           public:
-          - 'elana-site/public/**'
+            - 'elana-site/public/**'
+
+    - name: Debug
+      run: |
+        echo "src changes: ${{ steps.filter.outputs.src }}"
+        echo "public changes: ${{ steps.filter.outputs.public }}"
+        git log -2 --oneline  # Show last 2 commits
 
     - name: update src
-      if: steps.changes.outputs.src == 'true'
+      if: steps.filter.outputs.src == 'true'
       run: |
         echo "New content added to /src $(date)" >> ./elana-site/src/log.txt
    
     - name: update public
-      if: steps.changes.outputs.public == 'true'
+      if: steps.filter.outputs.public == 'true'
       run: |
         echo "New content added to /public $(date)" >> ./elana-site/public/log.txt
       
     - name: Configure Git
+      if: steps.filter.outputs.src == 'true' || steps.filter.outputs.public == 'true'
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
     - name: Commit file
+      if: steps.filter.outputs.src == 'true' || steps.filter.outputs.public == 'true'
       run: |
-        git add ./elana-site
-        git commit -m "Add log"
-        git push
+        if [[ -n "$(git status --porcelain)" ]]; then
+          git add ./elana-site
+          git commit -m "Add log"
+          git push
+        else
+          echo "No changes to commit"
+        fi
