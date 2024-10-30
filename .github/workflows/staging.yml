@@ -5,6 +5,7 @@ on:
     branches: [ main, staging ]
     paths:
       - elana-site/src/**
+      - elana-site/public/**
   workflow_dispatch:
 
 jobs:
@@ -28,5 +29,5 @@ jobs:
     - name: Commit file
       run: |
         git add staging.txt
-        git commit -m "Add empty file"
+        git commit -m "Add timestamp to staging.txt"
         git push
