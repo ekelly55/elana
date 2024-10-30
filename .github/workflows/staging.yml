@@ -2,7 +2,7 @@ name: Create Empty File
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, staging ]
   workflow_dispatch:
 
 jobs:
@@ -15,15 +15,15 @@ jobs:
     - uses: actions/checkout@v4
       
     - name: Create empty file
-      run: touch staging.txt
+      run: touch staging2.txt
       
     - name: Configure Git
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        
+
     - name: Commit file
       run: |
-        git add staging.txt
+        git add staging2.txt
         git commit -m "Add empty file"
         git push
