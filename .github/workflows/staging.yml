@@ -34,7 +34,7 @@ jobs:
         
       - name: Commit file
         run: |
-          git add test.txt
+          git add elana-site/test.txt
           git commit -m "Add empty file"
           git push
 
