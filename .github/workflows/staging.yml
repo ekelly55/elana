@@ -27,13 +27,10 @@ jobs:
         filters: |
           src:
             - 'elana-site/src/**'
-          public:
-            - 'elana-site/public/**'
 
     - name: Debug
       run: |
         echo "src changes: ${{ steps.filter.outputs.src }}"
-        echo "public changes: ${{ steps.filter.outputs.public }}"
         git log -2 --oneline
 
     - name: update src
@@ -44,14 +41,4 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add ./elana-site/src/log.txt
         git commit -m "Add log to src"
-        git push
-   
-    - name: update public
-      if: steps.filter.outputs.public == 'true'
-      run: |
-        echo "New content added to /public $(date)" >> ./elana-site/public/log.txt
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add ./elana-site/public/log.txt
-        git commit -m "Add log to public"
         git push
