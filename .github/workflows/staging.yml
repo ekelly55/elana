@@ -4,8 +4,8 @@ on:
   push:
     branches: [ staging ]
     paths:
-      - elana-site/**
-
+      - elana-site/src/**
+      - elana-site/public/**
   workflow_dispatch:
 
 jobs:
@@ -33,6 +33,12 @@ jobs:
             - 'elana-site/src/**'
           public:
             - 'elana-site/public/**'
+
+    - name: Debug
+      run: |
+        echo "src changes: ${{ steps.filter.outputs.src }}"
+        echo "public changes: ${{ steps.filter.outputs.public }}"
+        git log -2 --oneline
 
     - name: update src
       if: steps.filter.outputs.src == 'true'
