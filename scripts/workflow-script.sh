@@ -15,7 +15,7 @@ cat <<EOT >> staging.yml
 on:
   push:
     branches:
-      - main
+      - staging
     paths:
       - elana-site/$path_name/**
   workflow_dispatch:
