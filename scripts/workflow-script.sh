@@ -26,7 +26,7 @@ cat <<EOT >> staging.yml
     - name: Get previous commit
       id: get-prev-commit
       run: |
-          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT   
+          echo "prev_commit=\$(git rev-parse staging~1)" >> \$GITHUB_OUTPUT   
 
     - uses: dorny/paths-filter@v3
       id: filter
