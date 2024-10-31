@@ -133,3 +133,44 @@ jobs:
         git add ./elana-site/lib
         git commit -m "Add log to lib"
         git push
+
+  create-foo-log:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: staging
+        fetch-depth: 0
+    
+    - name: Get previous commit
+      id: get-prev-commit
+      run: |
+          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT   
+
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+        ref: ${{ github.sha }}
+        filters: |
+          foo:
+            - 'elana-site/foo/**'
+
+    - name: Debug
+      run: |
+        echo "foo changes: ${{ steps.filter.outputs.foo }}"
+        git log -2 --oneline
+
+    - name: update foo
+      if: steps.filter.outputs.foo == 'true'
+      run: |
+        echo "New content added to /foo $(date)" >> ./elana-site/foo/log.txt
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add ./elana-site/foo
+        git commit -m "Add log to foo"
+        git push
