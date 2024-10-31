@@ -65,7 +65,7 @@ jobs:
     - name: Get previous commit
       id: get-prev-commit
       run: |
-          echo "prev_commit=a0a9c696b587b81f4a613a5486df25f23a26163d" >>    
+          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT
 
     - uses: dorny/paths-filter@v3
       id: filter
