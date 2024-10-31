@@ -17,15 +17,21 @@ cat <<EOT >> staging.yml
       contents: write
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
         ref: staging
         fetch-depth: 0
     
+    - name: Get previous commit
+      id: get-prev-commit
+      run: |
+          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT   
+
     - uses: dorny/paths-filter@v3
       id: filter
       with:
-        base: 'origin/staging'
+        base: \${{ steps.get-prev-commit.outputs.prev_commit }}
         ref: \${{ github.sha }}
         filters: |
           ${path_name}:
