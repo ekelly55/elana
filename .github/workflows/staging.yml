@@ -4,8 +4,7 @@ on:
   push:
     branches: [ staging ]
     paths:
-      - elana-site/src/**
-      - elana-site/public/**
+      - elana-site/**
   workflow_dispatch:
 
 jobs:
@@ -18,16 +17,13 @@ jobs:
     - uses: actions/checkout@v4
       with:
         ref: staging
-        # fetch all previous commits
         fetch-depth: 0
     
     - uses: dorny/paths-filter@v3
       id: filter
       with:
-        # previous commit SHA
         base: ${{ github.event.before }}
-        # current commit SHA
-        ref: ${{ github.sha }}            
+        ref: ${{ github.sha }}
         filters: |
           src:
             - 'elana-site/src/**'
@@ -44,25 +40,18 @@ jobs:
       if: steps.filter.outputs.src == 'true'
       run: |
         echo "New content added to /src $(date)" >> ./elana-site/src/log.txt
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add ./elana-site/src/log.txt
+        git commit -m "Add log to src"
+        git push
    
     - name: update public
       if: steps.filter.outputs.public == 'true'
       run: |
         echo "New content added to /public $(date)" >> ./elana-site/public/log.txt
-      
-    - name: Configure Git
-      if: steps.filter.outputs.src == 'true' || steps.filter.outputs.public == 'true'
-      run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-    - name: Commit file
-      if: steps.filter.outputs.src == 'true' || steps.filter.outputs.public == 'true'
-      run: |
-        if [[ -n "$(git status --porcelain)" ]]; then
-          git add ./elana-site
-          git commit -m "Add log"
-          git push
-        else
-          echo "No changes to commit"
-        fi
+        git add ./elana-site/public/log.txt
+        git commit -m "Add log to public"
+        git push
