@@ -215,3 +215,44 @@ jobs:
         git add ./elana-site/emk
         git commit -m "Add log to emk"
         git push
+
+  create-milo-log:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: staging
+        fetch-depth: 0
+    
+    - name: Get previous commit
+      id: get-prev-commit
+      run: |
+          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT   
+
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+        ref: ${{ github.sha }}
+        filters: |
+          milo:
+            - 'elana-site/milo/**'
+
+    - name: Debug
+      run: |
+        echo "milo changes: ${{ steps.filter.outputs.milo }}"
+        git log -2 --oneline
+
+    - name: update milo
+      if: steps.filter.outputs.milo == 'true'
+      run: |
+        echo "New content added to /milo $(date)" >> ./elana-site/milo/log.txt
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add ./elana-site/milo
+        git commit -m "Add log to milo"
+        git push
