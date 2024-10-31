@@ -25,7 +25,7 @@ cat <<EOT >> staging.yml
     - uses: dorny/paths-filter@v3
       id: filter
       with:
-        base: \${{ github.event.before }}
+        base: 'origin/staging'
         ref: \${{ github.sha }}
         filters: |
           ${path_name}:

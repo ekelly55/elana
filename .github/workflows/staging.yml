@@ -22,7 +22,7 @@ jobs:
     - uses: dorny/paths-filter@v3
       id: filter
       with:
-        base: ${{ github.event.before }}
+        base: 'origin/staging'
         ref: ${{ github.sha }}
         filters: |
           src:
@@ -43,7 +43,6 @@ jobs:
         git commit -m "Add log to src"
         git push
 
-
   create-public-log:
     runs-on: ubuntu-latest
     permissions:
@@ -58,7 +57,7 @@ jobs:
     - uses: dorny/paths-filter@v3
       id: filter
       with:
-        base: ${{ github.event.before }}
+        base: 'origin/staging'
         ref: ${{ github.sha }}
         filters: |
           public:
