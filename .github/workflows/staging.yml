@@ -119,3 +119,40 @@ jobs:
       run: |
         cd elana-site/lib
         date 
+
+  create-foo-log:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: staging
+        fetch-depth: 0
+    
+    - name: Get previous commit
+      id: get-prev-commit
+      run: |
+          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT   
+
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+        ref: ${{ github.sha }}
+        filters: |
+          foo:
+            - 'elana-site/foo/**'
+
+    - name: Debug
+      run: |
+        echo "foo changes: ${{ steps.filter.outputs.foo }}"
+        git log -2 --oneline
+
+    - name: get date of foo change
+      if: steps.filter.outputs.foo == 'true'
+      run: |
+        cd elana-site/foo
+        date 
