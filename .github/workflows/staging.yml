@@ -42,7 +42,7 @@ jobs:
     - name: run src step
       if: steps.filter.outputs.src == 'true'
       run: |
-        cd src
+        cd elana-site/src
         date      
 
 
