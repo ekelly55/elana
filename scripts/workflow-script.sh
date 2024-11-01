@@ -11,40 +11,42 @@ echo "Adding $path_name to staging.yml"
 
 cat <<EOT >> staging.yml
 
-  create-${path_name}-log:
+  id-${path_name}-changes:
+    needs: set-environment
     runs-on: ubuntu-latest
     permissions:
       contents: write
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        ref: staging
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: \${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=\$(git rev-parse HEAD~1)" >> \$GITHUB_OUTPUT
     
-    - name: Get previous commit
-      id: get-prev-commit
-      run: |
-          echo "prev_commit=\$(git rev-parse staging~1)" >> \$GITHUB_OUTPUT   
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: \${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: \${{ github.sha }}
+          filters: |
+            ${path_name}:
+              - 'elana-site/${path_name}/**'
 
-    - uses: dorny/paths-filter@v3
-      id: filter
-      with:
-        base: \${{ steps.get-prev-commit.outputs.prev_commit }}
-        ref: \${{ github.sha }}
-        filters: |
-          ${path_name}:
-            - 'elana-site/${path_name}/**'
+      - name: Debug
+        run: |
+          echo "${path_name} changes: \${{ steps.filter.outputs.${path_name} }}"
+          echo "Target branch: \${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: \${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
 
-    - name: Debug
-      run: |
-        echo "${path_name} changes: \${{ steps.filter.outputs.${path_name} }}"
-        git log -2 --oneline
-
-    - name: get date of ${path_name} change
-      if: steps.filter.outputs.${path_name} == 'true'
-      run: |
-        cd elana-site/${path_name}
-        date 
+      - name: Print deployment account
+        if: steps.filter.outputs.${path_name} == 'true'
+        run: |
+          echo "Change to ${path_name} on branch \${{ needs.set-environment.outputs.target_branch }} to deploy to \${{ needs.set-environment.outputs.aws_account }}"
 EOT
