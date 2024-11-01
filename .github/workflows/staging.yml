@@ -1,8 +1,7 @@
 name: Log changes and Id Deployment Env
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches: [ main, staging ]
     paths:
       - elana-site/**
@@ -12,7 +11,6 @@ jobs:
   set-environment:
     runs-on: ubuntu-latest
     # Only run if the PR was merged
-    if: github.event.pull_request.merged == true
     permissions:
       contents: read
     
@@ -24,7 +22,7 @@ jobs:
       - name: Set Environment Variables
         id: set-env
         run: |
-          TARGET_BRANCH=${{ github.base_ref }}
+          TARGET_BRANCH=${GITHUB_REF#refs/heads/}
           echo "target_branch=${TARGET_BRANCH}" >> $GITHUB_OUTPUT
           
           if [[ "${TARGET_BRANCH}" == "main" ]]; then
@@ -114,3 +112,198 @@ jobs:
         if: steps.filter.outputs.public == 'true'
         run: |
           echo "Change to public on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
+  
+  id-emk-changes:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
+    
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: ${{ github.sha }}
+          filters: |
+            emk:
+              - 'elana-site/emk/**'
+
+      - name: Debug
+        run: |
+          echo "emk changes: ${{ steps.filter.outputs.emk }}"
+          echo "Target branch: ${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: ${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
+
+      - name: Print deployment account
+        if: steps.filter.outputs.emk == 'true'
+        run: |
+          echo "Change to emk on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
+
+  id-kaye-changes:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
+    
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: ${{ github.sha }}
+          filters: |
+            kaye:
+              - 'elana-site/kaye/**'
+
+      - name: Debug
+        run: |
+          echo "kaye changes: ${{ steps.filter.outputs.kaye }}"
+          echo "Target branch: ${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: ${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
+
+      - name: Print deployment account
+        if: steps.filter.outputs.kaye == 'true'
+        run: |
+          echo "Change to kaye on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
+
+  id-lib-changes:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
+    
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: ${{ github.sha }}
+          filters: |
+            lib:
+              - 'elana-site/lib/**'
+
+      - name: Debug
+        run: |
+          echo "lib changes: ${{ steps.filter.outputs.lib }}"
+          echo "Target branch: ${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: ${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
+
+      - name: Print deployment account
+        if: steps.filter.outputs.lib == 'true'
+        run: |
+          echo "Change to lib on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
+
+  id-foo-changes:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
+    
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: ${{ github.sha }}
+          filters: |
+            foo:
+              - 'elana-site/foo/**'
+
+      - name: Debug
+        run: |
+          echo "foo changes: ${{ steps.filter.outputs.foo }}"
+          echo "Target branch: ${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: ${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
+
+      - name: Print deployment account
+        if: steps.filter.outputs.foo == 'true'
+        run: |
+          echo "Change to foo on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
+
+  id-eta-changes:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
+    
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: ${{ github.sha }}
+          filters: |
+            eta:
+              - 'elana-site/eta/**'
+
+      - name: Debug
+        run: |
+          echo "eta changes: ${{ steps.filter.outputs.eta }}"
+          echo "Target branch: ${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: ${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
+
+      - name: Print deployment account
+        if: steps.filter.outputs.eta == 'true'
+        run: |
+          echo "Change to eta on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
