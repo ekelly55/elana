@@ -151,3 +151,81 @@ jobs:
         if: steps.filter.outputs.emk == 'true'
         run: |
           echo "Change to emk on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
+
+  id-kaye-changes:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
+    
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: ${{ github.sha }}
+          filters: |
+            kaye:
+              - 'elana-site/kaye/**'
+
+      - name: Debug
+        run: |
+          echo "kaye changes: ${{ steps.filter.outputs.kaye }}"
+          echo "Target branch: ${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: ${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
+
+      - name: Print deployment account
+        if: steps.filter.outputs.kaye == 'true'
+        run: |
+          echo "Change to kaye on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
+
+  id-lib-changes:
+    needs: set-environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.set-environment.outputs.target_branch }}
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: get-prev-commit
+        run: |
+          echo "prev_commit=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
+    
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+          ref: ${{ github.sha }}
+          filters: |
+            lib:
+              - 'elana-site/lib/**'
+
+      - name: Debug
+        run: |
+          echo "lib changes: ${{ steps.filter.outputs.lib }}"
+          echo "Target branch: ${{ needs.set-environment.outputs.target_branch }}"
+          echo "AWS Account: ${{ needs.set-environment.outputs.aws_account }}"
+          git log -2 --oneline
+
+      - name: Print deployment account
+        if: steps.filter.outputs.lib == 'true'
+        run: |
+          echo "Change to lib on branch ${{ needs.set-environment.outputs.target_branch }} to deploy to ${{ needs.set-environment.outputs.aws_account }}"
