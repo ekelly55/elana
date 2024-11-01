@@ -39,7 +39,7 @@ jobs:
         echo "src changes: ${{ steps.filter.outputs.src }}"
         git log -2 --oneline
 
-    - name: run src step
+    - name: get date of src change
       if: steps.filter.outputs.src == 'true'
       run: |
         cd elana-site/src
@@ -47,50 +47,6 @@ jobs:
 
 
   create-public-log:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        ref: staging
-        fetch-depth: 0
-    
-    - name: Get previous commit
-      id: get-prev-commit
-      run: |
-          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT
-
-    - uses: dorny/paths-filter@v3
-      id: filter
-      with:
-        base: ${{ steps.get-prev-commit.outputs.prev_commit }}
-        ref: ${{ github.sha }}
-        filters: |
-          public:
-            - 'elana-site/public/**'
-
-    - name: Debug
-      run: |
-        echo "public changes: ${{ steps.filter.outputs.public }}"
-        git log -2 --oneline
-
-    - name: update public
-      if: steps.filter.outputs.public == 'true'
-      run: |
-        echo "New content added to /public $(date)" >> ./elana-site/public/log.txt
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add ./elana-site/public
-        git commit -m "Add log to public"
-        git push
-
-  
-  
-  
-  create-bee-log:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -113,20 +69,16 @@ jobs:
         base: ${{ steps.get-prev-commit.outputs.prev_commit }}
         ref: ${{ github.sha }}
         filters: |
-          bee:
-            - 'elana-site/bee/**'
+          public:
+            - 'elana-site/public/**'
 
     - name: Debug
       run: |
-        echo "bee changes: ${{ steps.filter.outputs.bee }}"
+        echo "public changes: ${{ steps.filter.outputs.public }}"
         git log -2 --oneline
 
-    - name: update bee
-      if: steps.filter.outputs.bee == 'true'
+    - name: get date of public change
+      if: steps.filter.outputs.public == 'true'
       run: |
-        echo "New content added to /bee $(date)" >> ./elana-site/bee/log.txt
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add ./elana-site/bee
-        git commit -m "Add log to bee"
-        git push
+        cd elana-site/public
+        date 

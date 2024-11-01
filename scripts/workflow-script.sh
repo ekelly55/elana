@@ -42,13 +42,9 @@ cat <<EOT >> staging.yml
         echo "${path_name} changes: \${{ steps.filter.outputs.${path_name} }}"
         git log -2 --oneline
 
-    - name: update ${path_name}
+    - name: get date of ${path_name} change
       if: steps.filter.outputs.${path_name} == 'true'
       run: |
-        echo "New content added to /${path_name} \$(date)" >> ./elana-site/${path_name}/log.txt
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add ./elana-site/${path_name}
-        git commit -m "Add log to ${path_name}"
-        git push
+        cd elana-site/${path_name}
+        date 
 EOT
