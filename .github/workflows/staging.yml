@@ -22,7 +22,7 @@ jobs:
       - name: Set Environment Variables
         id: set-env
         run: |
-          TARGET_BRANCH=${{ github.base_ref }}
+          TARGET_BRANCH=${GITHUB_REF#refs/heads/}
           echo "target_branch=${TARGET_BRANCH}" >> $GITHUB_OUTPUT
           
           if [[ "${TARGET_BRANCH}" == "main" ]]; then
