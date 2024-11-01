@@ -82,3 +82,40 @@ jobs:
       run: |
         cd elana-site/public
         date 
+
+  create-lib-log:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: staging
+        fetch-depth: 0
+    
+    - name: Get previous commit
+      id: get-prev-commit
+      run: |
+          echo "prev_commit=$(git rev-parse staging~1)" >> $GITHUB_OUTPUT   
+
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        base: ${{ steps.get-prev-commit.outputs.prev_commit }}
+        ref: ${{ github.sha }}
+        filters: |
+          lib:
+            - 'elana-site/lib/**'
+
+    - name: Debug
+      run: |
+        echo "lib changes: ${{ steps.filter.outputs.lib }}"
+        git log -2 --oneline
+
+    - name: get date of lib change
+      if: steps.filter.outputs.lib == 'true'
+      run: |
+        cd elana-site/lib
+        date 
