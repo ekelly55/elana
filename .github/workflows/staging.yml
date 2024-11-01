@@ -2,13 +2,37 @@ name: Log changes to staging
 
 on:
   push:
-    branches: [ staging ]
+    branches: [ main, staging ]
     paths:
       - elana-site/**
   workflow_dispatch:
 
 jobs:
-  create-src-log:
+  set-environment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    outputs:
+      enviroment:
+      value: ${{ steps.enviroment.outputs.enviroment }}
+
+  steps:
+  - name: Set Enviroment
+    id: enviroment
+    run: |
+        BRANCH_NAME=${{ github.base_ref }}   
+        if [[ "$BRANCH_NAME" == "main" || "$BRANCH_NAME" == "refs/heads/main" ]]; then
+          echo "enviroment=production" >> $GITHUB_OUTPUT
+        elif [[ "$BRANCH_NAME" == "staging" || "$BRANCH_NAME" == "refs/heads/staging" ]]; then
+          echo "enviroment=staging" >> $GITHUB_OUTPUT
+        else 
+          echo "Unknown branch name: $BRANCH_NAME"
+          exit 1
+        fi
+      shell: bash
+
+  id-src-change-branch:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,8 +66,7 @@ jobs:
     - name: get date of src change
       if: steps.filter.outputs.src == 'true'
       run: |
-        cd elana-site/src
-        date      
+        echo "change to src on branch $BRANCH_NAME"      
 
 
   create-public-log:
